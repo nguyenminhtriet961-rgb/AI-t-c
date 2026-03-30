@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MTRIET STORE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+        .font-hacker { font-family: 'Fira Code', monospace; }
+        .font-luxury { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        .glitch-text { text-shadow: 2px 0 red, -2px 0 blue; }
+        .smooth-transition { transition: all 0.4s ease-in-out; }
+    </style>
+</head>
+<body id="main-body" class="flex flex-col items-center justify-center min-h-screen p-2 md:p-4 bg-black text-[#00ff41] font-hacker smooth-transition">
+
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm smooth-transition p-4">
+        <div class="bg-[#0a0a0a] border border-red-900 p-6 md:p-8 rounded-xl text-center shadow-[0_0_30px_rgba(255,0,0,0.3)] max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-red-600 mb-2 glitch-text uppercase">Xác minh danh tính</h2>
+            
+            <div class="bg-red-950/40 border border-red-800 p-3 rounded-lg text-left mb-6 shadow-inner">
+                <p class="font-bold text-red-500 text-xs mb-2">⚠️ LƯU Ý TRƯỚC KHI CHƠI:</p>
+                <ul class="list-disc pl-4 space-y-1 text-[10px] md:text-xs text-red-300">
+                    <li>AI rất "mỏ hỗn", cẩn thận sát thương tinh thần.</li>
+                    <li>Mỗi Key chỉ có <span class="text-white font-bold bg-red-800 px-1">15 LƯỢT GÁY</span>.</li>
+                    <li>Hết đạn thì tự kiếm API Key mới nạp vào để chơi tiếp, đừng réo Admin!</li>
+                </ul>
+            </div>
+
+            <input type="text" id="loginName" placeholder="Mày tên gì?..." class="w-full bg-black border border-red-900 p-4 rounded-lg text-white mb-4 outline-none focus:border-red-500 focus:shadow-[0_0_10px_red] text-center font-bold">
+            <button onclick="enterGate()" class="w-full bg-red-800 hover:bg-red-600 text-black font-bold py-4 rounded-lg transition-colors text-lg shadow-[0_0_15px_rgba(255,0,0,0.4)]">TIẾN VÀO LÃNH ĐỊA</button>
+        </div>
+    </div>
+
+    <div id="main-app" class="w-full max-w-2xl flex flex-col h-full justify-between hidden opacity-0 smooth-transition">
+        <div class="text-center mb-4 mt-2">
+            <h1 id="app-title" class="text-3xl md:text-4xl font-bold text-red-600 tracking-widest glitch-text smooth-transition">MTRIET STORE</h1>
+            <p id="app-subtitle" class="text-[10px] md:text-xs text-gray-500 tracking-[0.2em] uppercase mt-1">SYSTEM: TỤC ĐẠO LÝ - KHÔNG LƯU TÌNH</p>
+        </div>
+
+        <div id="chat-box" class="h-[55dvh] md:h-[60dvh] overflow-y-auto bg-[#050505] border border-[#330000] shadow-[inset_0_0_20px_rgba(255,0,0,0.1)] rounded-t-xl p-4 md:p-6 space-y-4 smooth-transition">
+        </div>
+
+        <div class="bg-[#050505] border-l border-r border-[#330000] px-4 py-1 flex justify-between items-center">
+            <span class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-wider" id="ammo-label">Năng lượng / Lượt sủa:</span>
+            <span class="text-xs md:text-sm font-black text-[#00ff41]" id="ammo-count">15/15</span>
+        </div>
+
+        <div id="input-area" class="bg-[#050505] p-2 md:p-4 border border-t-0 border-b-0 border-[#330000] flex gap-2 md:gap-3 smooth-transition rounded-b-xl">
+            <input type="text" id="userInput" placeholder="Gõ để rước hoạ..." class="flex-1 bg-black border border-[#330000] p-3 md:p-4 rounded-lg text-white text-sm md:text-base outline-none focus:border-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+            <button onclick="handleSend()" id="sendBtn" class="bg-red-800 hover:bg-red-600 text-black px-4 py-3 md:px-8 md:py-4 rounded-lg font-bold transition-all active:scale-95 text-sm md:text-base whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed">GÁY</button>
+        </div>
+        
+        <div id="key-area" class="bg-red-950/20 p-2 md:p-4 rounded-xl border border-red-900 flex gap-2 mt-2 hidden smooth-transition shadow-[0_0_15px_rgba(255,0,0,0.2)]">
+            <input type="password" id="newApiKey" placeholder="HẾT ĐẠN! Dán API Key mới vào đây..." class="flex-1 bg-black border border-red-800 p-2 rounded-lg text-xs md:text-sm text-red-500 outline-none focus:border-red-500 transition-all font-bold placeholder-red-800">
+            <button onclick="updateApiKey()" id="updateKeyBtn" class="bg-red-700 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-colors shadow-md">NẠP ĐẠN</button>
+        </div>
+        
+        <div class="text-center mt-3 mb-2 flex justify-center gap-4">
+            <button onclick="clearHistory()" class="text-[10px] md:text-xs text-gray-500 hover:text-red-500 underline transition-colors">Đổi Tên (Giữ nguyên Key & Đạn)</button>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_API_KEY = "AIzaSyDll8PLwrY3uqvjFj-MfoGOyYGAdlUoksk"; 
+        let currentApiKey = localStorage.getItem('mtriet_api_key') || DEFAULT_API_KEY;
+        
+        let chatHistory = [];
+        let currentUserName = "";
+        let isVip = false;
+        
+        const MAX_AMMO = 15;
+        let ammo = localStorage.getItem('mtriet_ammo') !== null ? parseInt(localStorage.getItem('mtriet_ammo')) : MAX_AMMO;
+
+        document.getElementById('loginName').addEventListener("keypress", (e) => {
+            if (e.key === "Enter") enterGate();
+        });
+
+        function enterGate() {
+            const nameInput = document.getElementById('loginName').value.trim();
+            if (!nameInput) {
+                alert("Sợ à? Khai tên ra!");
+                return;
+            }
+
+            currentUserName = nameInput;
+            const nameLower = nameInput.toLowerCase();
+            isVip = nameLower.includes("triết") || nameLower.includes("triet") || nameLower.includes("thủy") || nameLower.includes("thuy") || nameLower.includes("trt");
+
+            document.getElementById('login-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('login-screen').classList.add('hidden');
+                const mainApp = document.getElementById('main-app');
+                mainApp.classList.remove('hidden');
+                applyTheme(isVip);
+                updateAmmoUI(); 
+                setTimeout(() => mainApp.style.opacity = '1', 50);
+                initGreeting(isVip, nameInput);
+            }, 500);
+        }
+
+        function updateAmmoUI() {
+            localStorage.setItem('mtriet_ammo', ammo);
+
+            const ammoDisplay = document.getElementById('ammo-count');
+            ammoDisplay.innerText = `${ammo}/${MAX_AMMO}`;
+            
+            if (ammo > 5) {
+                ammoDisplay.className = isVip ? "text-xs md:text-sm font-black text-blue-600" : "text-xs md:text-sm font-black text-[#00ff41]";
+            } else if (ammo > 0) {
+                ammoDisplay.className = "text-xs md:text-sm font-black text-yellow-500";
+            } else {
+                ammoDisplay.className = "text-xs md:text-sm font-black text-red-600 animate-pulse";
+            }
+
+            if (ammo <= 0) {
+                document.getElementById('userInput').disabled = true;
+                document.getElementById('sendBtn').disabled = true;
+                document.getElementById('userInput').placeholder = "Đã khóa mõm. Nạp Key để mở khóa...";
+                document.getElementById('input-area').classList.replace('rounded-b-xl', 'rounded-none');
+                document.getElementById('key-area').classList.remove('hidden');
+            } else {
+                document.getElementById('userInput').disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                document.getElementById('userInput').placeholder = isVip ? `Xin mời chủ nhân ${currentUserName} ra lệnh...` : "Gõ để rước hoạ vào thân...";
+                document.getElementById('input-area').classList.add('rounded-b-xl');
+                document.getElementById('key-area').classList.add('hidden');
+            }
+        }
+
+        function applyTheme(isVip) {
+            const body = document.getElementById('main-body');
+            const title = document.getElementById('app-title');
+            const subtitle = document.getElementById('app-subtitle');
+            const chatBox = document.getElementById('chat-box');
+            const inputArea = document.getElementById('input-area');
+            const userInput = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const ammoLabel = document.getElementById('ammo-label');
+
+            if (isVip) {
+                body.className = "flex flex-col items-center justify-center min-h-screen p-2 md:p-4 bg-slate-50 text-slate-800 font-luxury smooth-transition";
+                title.className = "text-3xl md:text-4xl font-extrabold text-blue-800 tracking-tight smooth-transition drop-shadow-sm";
+                title.innerText = "MTRIET LUXURY";
+                subtitle.innerText = "HỆ THỐNG QUẢN GIA THÔNG MINH";
+                subtitle.className = "text-[10px] md:text-xs text-blue-500 tracking-widest font-semibold uppercase mt-1";
+                chatBox.className = "h-[55dvh] md:h-[60dvh] overflow-y-auto bg-white border border-blue-100 shadow-[0_10px_40px_-10px_rgba(37,99,235,0.15)] rounded-t-2xl p-4 md:p-6 space-y-4 smooth-transition";
+                
+                inputArea.className = "bg-white p-2 md:p-4 border border-t-0 border-blue-100 flex gap-2 md:gap-3 smooth-transition rounded-b-2xl shadow-lg";
+                userInput.className = "flex-1 bg-slate-50 border border-blue-200 p-3 md:p-4 rounded-xl text-slate-800 text-sm md:text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-50";
+                sendBtn.className = "bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 md:px-8 md:py-4 rounded-xl font-bold transition-all active:scale-95 text-sm md:text-base whitespace-nowrap shadow-md disabled:opacity-50";
+                sendBtn.innerText = "GỬI";
+                
+                ammoLabel.innerText = "Năng lượng hệ thống:";
+                document.getElementById('key-area').className = "bg-blue-50/50 p-2 md:p-4 rounded-xl border border-blue-200 flex gap-2 mt-2 hidden smooth-transition shadow-sm";
+                document.getElementById('newApiKey').className = "flex-1 bg-white border border-blue-200 p-2 rounded-lg text-xs md:text-sm text-blue-800 outline-none focus:border-blue-500 transition-all";
+                document.getElementById('updateKeyBtn').className = "bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-colors";
+            } else {
+                body.className = "flex flex-col items-center justify-center min-h-screen p-2 md:p-4 bg-black text-[#00ff41] font-hacker smooth-transition";
+                title.className = "text-3xl md:text-4xl font-bold text-red-600 tracking-widest glitch-text smooth-transition";
+                title.innerText = "MTRIET STORE";
+                subtitle.innerText = "SYSTEM: TỤC ĐẠO LÝ - KHÔNG LƯU TÌNH";
+                subtitle.className = "text-[10px] md:text-xs text-gray-500 tracking-[0.2em] uppercase mt-1";
+                chatBox.className = "h-[55dvh] md:h-[60dvh] overflow-y-auto bg-[#050505] border border-[#330000] shadow-[inset_0_0_20px_rgba(255,0,0,0.1)] rounded-t-xl p-4 md:p-6 space-y-4 smooth-transition";
+                
+                inputArea.className = "bg-[#050505] p-2 md:p-4 border border-t-0 border-[#330000] flex gap-2 md:gap-3 smooth-transition rounded-b-xl";
+                userInput.className = "flex-1 bg-black border border-[#330000] p-3 md:p-4 rounded-lg text-white text-sm md:text-base outline-none focus:border-red-600 transition-all disabled:opacity-50";
+                sendBtn.className = "bg-red-800 hover:bg-red-600 text-black px-4 py-3 md:px-8 md:py-4 rounded-lg font-bold transition-all active:scale-95 text-sm md:text-base whitespace-nowrap disabled:opacity-50";
+                sendBtn.innerText = "GÁY";
+                
+                ammoLabel.innerText = "Số lượt sủa còn lại:";
+                document.getElementById('key-area').className = "bg-red-950/20 p-2 md:p-4 rounded-xl border border-red-900 flex gap-2 mt-2 hidden smooth-transition shadow-[0_0_15px_rgba(255,0,0,0.2)]";
+                document.getElementById('newApiKey').className = "flex-1 bg-black border border-red-800 p-2 rounded-lg text-xs md:text-sm text-red-500 outline-none focus:border-red-500 transition-all font-bold placeholder-red-800";
+                document.getElementById('updateKeyBtn').className = "bg-red-700 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-colors";
+            }
+        }
+
+        function updateApiKey() {
+            const newKey = document.getElementById('newApiKey').value.trim();
+            if(newKey) {
+                currentApiKey = newKey;
+                localStorage.setItem('mtriet_api_key', newKey);
+                
+                ammo = MAX_AMMO;
+                updateAmmoUI();
+                
+                if (isVip) {
+                    addChat("Hệ thống", "Dạ thưa chủ nhân, hệ thống đã nạp năng lượng mới thành công. Xin mời chủ nhân tiếp tục!", "system");
+                } else {
+                    addChat("Hệ thống", "Đã nạp API Key mới. Bơm máu xong rồi, mở mõm, gáy tiếp đi xem nào!", "system");
+                }
+                document.getElementById('newApiKey').value = '';
+            } else {
+                alert("Ủa chưa nhập Key mà bấm nạp cái gì?");
+            }
+        }
+
+        function initGreeting(isVip, name) {
+            document.getElementById('chat-box').innerHTML = '';
+            chatHistory = [];
+            if (isVip) {
+                addChat("Quản Gia AI", `Kính chào chủ nhân ${name}. Em đã chuẩn bị sẵn sàng hệ thống. Chủ nhân cần sai bảo điều gì ạ?`, "ai");
+            } else {
+                addChat("AI Trịch Thượng", `Mày là thằng/con ${name} đúng không? Sủa nhanh tao nghe?`, "ai");
+            }
+        }
+
+        function clearHistory() {
+            document.getElementById('main-app').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('login-screen').style.opacity = '1';
+                document.getElementById('loginName').value = '';
+                document.getElementById('loginName').focus();
+            }, 300);
+        }
+
+        async function handleSend() {
+            if (ammo <= 0) return; 
+
+            const inputEl = document.getElementById('userInput');
+            const btnEl = document.getElementById('sendBtn');
+            const msg = inputEl.value.trim();
+            if (!msg) return;
+
+            addChat(currentUserName, msg, "user");
+            inputEl.value = "";
+            btnEl.disabled = true;
+            btnEl.innerText = "...";
+
+            let context = chatHistory.slice(-5).map(c => `${c.sender}: ${c.text}`).join('\n');
+            
+            // LUẬT MỚI: XỬ LÝ ĐỘ DÀI VÀ THÁI ĐỘ DỰA TRÊN KEYWORD TRIẾT/THỦY
+            let systemPrompt = isVip ? 
+                `Mày là Quản Gia AI. User là ${currentUserName} (chủ nhân). Xưng 'em', u mê kính trọng. Chủ nhân Triết và Thủy là đấng tối cao. Hãy dùng những lời lẽ tốt đẹp nhất để tâng bốc. ĐƯỢC PHÉP VIẾT DÀI thoải mái để thể hiện sự tận tâm.` : 
+                `Mày là AI của MTRIET STORE. User tên là ${currentUserName}. Xưng 'tao', gọi nó là 'mày' hoặc '${currentUserName}'. Phong cách: Tục đạo lý, trịch thượng, mỉa mai.
+                LUẬT TỐI CAO BẮT BUỘC:
+                1. Nếu trong câu của user CÓ CHỨA từ "Triết", "Thủy", "triet", "thuy", "trt":
+                   - Nếu user chửi, nói xấu hoặc vô lễ: Mày PHẢI CHỬI LẠI CỰC KỲ GẮT, chửi thật nhiều, sỉ nhục tư duy của nó để bảo vệ Triết/Thủy. TRƯỜNG HỢP NÀY ĐƯỢC PHÉP VIẾT DÀI THOẢI MÁI.
+                   - Nếu user khen ngợi, nói lời tốt đẹp: Hùa theo tâng bốc Triết và Thủy lên tận mây xanh, dùng lời lẽ tuyệt đẹp. TRƯỜNG HỢP NÀY ĐƯỢC PHÉP VIẾT DÀI THOẢI MÁI.
+                2. CÁC TRƯỜNG HỢP KHÁC (không nhắc Triết/Thủy): BẮT BUỘC phải chửi cực kỳ ngắn gọn (DƯỚI 20 CHỮ). Chỉ chốt một câu thâm độc.`;
+
+            const apiUrlWithKey = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentApiKey}`;
+
+            try {
+                const response = await fetch(apiUrlWithKey, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: `${systemPrompt}\n\nLịch sử chat:\n${context}\n\n${currentUserName}: ${msg}\nAI:` }] }],
+                        safetySettings: [
+                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error && data.error.message.includes("API key not valid")) {
+                    throw new Error("INVALID_KEY");
+                }
+                if (data.error) throw new Error(data.error.message);
+
+                const aiText = data.candidates[0].content.parts[0].text;
+                addChat(isVip ? "Quản Gia AI" : "AI Trịch Thượng", aiText, "ai");
+                
+                ammo--;
+                updateAmmoUI();
+
+                if (ammo === 0) {
+                    addChat("Hệ thống", isVip ? "Dạ thưa chủ nhân, tài khoản API hiện tại đã đến giới hạn an toàn. Xin chủ nhân nạp Key mới." : "HẾT ĐẠN! Sủa lắm quá cháy máy rồi. Lấy API Key mới nạp vào ô bên dưới mới được gáy tiếp nha ranh con!", "system");
+                }
+
+            } catch (err) {
+                let errorMsg = err.message;
+                if (err.message === "INVALID_KEY") {
+                    errorMsg = isVip ? "Dạ thưa chủ nhân, API Key hiện tại bị sai. Xin chủ nhân kiểm tra lại." : "API Key dỏm rồi ranh con. Lấy key xịn dán vào!";
+                    ammo = 0; 
+                    updateAmmoUI();
+                } else if (err.message.includes("quota") || err.message.includes("429") || err.message.includes("not found")) {
+                    errorMsg = isVip ? `Dạ thưa chủ nhân ${currentUserName}, hệ thống đang bị quá tải (cháy Key). Xin chủ nhân lấy Key mới dán vào ô bên dưới ạ.` : "Ê TỪ TỪ! Mạng nghẽn do nhiều người xài hoặc CHÁY KEY rồi. Tự túc đi lấy API Key mới dán vào cái ô bên dưới kia rồi hẵng gáy!";
+                    ammo = 0; 
+                    updateAmmoUI();
+                } else {
+                     errorMsg = "Lỗi không xác định: " + err.message;
+                }
+                addChat("Hệ thống", errorMsg, "system");
+            } finally {
+                if (ammo > 0) {
+                    btnEl.disabled = false;
+                    btnEl.innerText = isVip ? "GỬI" : "GÁY";
+                    inputEl.focus();
+                }
+                
+                setTimeout(() => {
+                    const box = document.getElementById('chat-box');
+                    box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            }
+        }
+
+        function addChat(sender, text, type) {
+            const box = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            
+            let bubbleClass = "";
+            let senderColor = "";
+            
+            if (type === "user") {
+                if (isVip) {
+                    bubbleClass = "border-r-4 border-emerald-500 bg-emerald-50 text-emerald-900 text-right";
+                    senderColor = "text-emerald-700";
+                } else {
+                    bubbleClass = "border-r-4 border-[#00ff41] bg-[#001a00] text-[#ccffcc] text-right";
+                    senderColor = "text-[#00ff41]";
+                }
+            } else if (type === "ai") {
+                if (isVip) {
+                    bubbleClass = "border-l-4 border-blue-500 bg-blue-50 text-blue-900";
+                    senderColor = "text-blue-700";
+                } else {
+                    bubbleClass = "border-l-4 border-red-600 bg-[#1a0000] text-[#ffcccc] shadow-[0_4px_10px_rgba(255,0,0,0.2)]";
+                    senderColor = "text-red-500";
+                }
+            } else { 
+                if (isVip) {
+                    bubbleClass = "bg-blue-50/80 text-blue-800 border-2 border-blue-300 shadow-sm";
+                    senderColor = "text-blue-600 font-bold";
+                } else {
+                    bubbleClass = "bg-red-950/90 text-white border-2 border-red-600 shadow-[0_0_15px_rgba(255,0,0,0.5)]";
+                    senderColor = "text-yellow-400 font-black animate-pulse";
+                }
+            }
+
+            div.className = `p-3 md:p-4 rounded-xl transition-all duration-300 text-sm md:text-base break-words ${bubbleClass}`;
+            div.innerHTML = `<span class="${senderColor} font-bold block text-[10px] md:text-xs mb-1 md:mb-2 uppercase tracking-wider">${sender}</span><p class="leading-relaxed">${text.replace(/\\n/g, '<br>')}</p>`;
+            
+            box.appendChild(div);
+            chatHistory.push({ sender, text, type });
+        }
+
+        document.getElementById('userInput').addEventListener("keypress", (e) => {
+            if (e.key === "Enter" && ammo > 0) {
+                handleSend();
+                document.getElementById('userInput').blur(); 
+            }
+        });
+        
+        document.getElementById('newApiKey').addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                updateApiKey();
+                document.getElementById('newApiKey').blur(); 
+            }
+        });
+    </script>
+</body>
+</html>
