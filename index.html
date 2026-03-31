@@ -14,294 +14,284 @@
         ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
         .glitch-text { text-shadow: 2px 0 red, -2px 0 blue; }
         .smooth-transition { transition: all 0.4s ease-in-out; }
+        .toggle-checkbox:checked { right: 0; border-color: #68D391; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #68D391; }
     </style>
 </head>
 <body id="main-body" class="flex flex-col items-center justify-center min-h-screen p-2 md:p-4 bg-black text-[#00ff41] font-hacker smooth-transition">
 
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm smooth-transition p-4">
-        <div class="bg-[#0a0a0a] border border-red-900 p-6 md:p-8 rounded-xl text-center shadow-[0_0_30px_rgba(255,0,0,0.3)] max-w-sm w-full">
-            <h2 class="text-2xl font-bold text-red-600 mb-2 glitch-text uppercase">Xác minh danh tính</h2>
+        <div class="bg-[#0a0a0a] border border-red-900 p-6 md:p-8 rounded-xl text-center shadow-[0_0_30px_rgba(255,0,0,0.3)] max-w-sm w-full transition-all duration-300" id="login-box">
+            <h2 class="text-2xl font-bold text-red-600 mb-2 glitch-text uppercase">MTRIET STORE</h2>
             
-            <div class="bg-red-950/40 border border-red-800 p-3 rounded-lg text-left mb-6 shadow-inner">
-                <p class="font-bold text-red-500 text-xs mb-2">⚠️ LƯU Ý TRƯỚC KHI CHƠI:</p>
-                <ul class="list-disc pl-4 space-y-1 text-[10px] md:text-xs text-red-300">
-                    <li>AI rất "mỏ hỗn", cẩn thận sát thương tinh thần.</li>
-                    <li>Mỗi Key chỉ có <span class="text-white font-bold bg-red-800 px-1">15 LƯỢT GÁY</span>.</li>
-                    <li>Hết đạn thì tự kiếm API Key mới nạp vào để chơi tiếp, đừng réo Admin!</li>
-                </ul>
+            <div id="step-name">
+                <div class="bg-red-950/40 border border-red-800 p-3 rounded-lg text-left mb-6 shadow-inner">
+                    <p class="font-bold text-red-500 text-xs mb-2">⚠️ NỘI QUY LÃNH ĐỊA:</p>
+                    <ul class="list-disc pl-4 space-y-1 text-[10px] md:text-xs text-red-300">
+                        <li>Hệ thống AI chuyên dùng để chửi lộn xả stress.</li>
+                        <li>Đã tích hợp Voice AI the thé cực kỳ chói tai.</li>
+                    </ul>
+                </div>
+                <input type="text" id="loginName" placeholder="Mày tên gì?..." class="w-full bg-black border border-red-900 p-4 rounded-lg text-white mb-4 outline-none focus:border-red-500 text-center font-bold transition-colors">
+                <button onclick="nextStepLogin()" class="w-full bg-red-800 hover:bg-red-600 text-black font-bold py-4 rounded-lg transition-colors shadow-[0_0_15px_rgba(255,0,0,0.4)]">TIẾP TỤC</button>
             </div>
 
-            <input type="text" id="loginName" placeholder="Mày tên gì?..." class="w-full bg-black border border-red-900 p-4 rounded-lg text-white mb-4 outline-none focus:border-red-500 focus:shadow-[0_0_10px_red] text-center font-bold">
-            <button onclick="enterGate()" class="w-full bg-red-800 hover:bg-red-600 text-black font-bold py-4 rounded-lg transition-colors text-lg shadow-[0_0_15px_rgba(255,0,0,0.4)]">TIẾN VÀO LÃNH ĐỊA</button>
+            <div id="step-key" class="hidden">
+                <p class="text-sm text-red-400 mb-2 font-bold animate-pulse">KHO VŨ KHÍ API</p>
+                <p class="text-[10px] text-gray-400 mb-4">Dán danh sách Key vào đây (tự động loại bỏ Key chết)</p>
+                <textarea id="initialApiKeys" rows="4" placeholder="AIzaSy...&#10;AIzaSy..." class="w-full bg-black border border-red-900 p-3 rounded-lg text-red-500 mb-4 outline-none focus:border-red-500 text-xs transition-colors resize-none font-mono"></textarea>
+                <button onclick="enterGate()" class="w-full bg-red-800 hover:bg-red-600 text-black font-bold py-4 rounded-lg transition-colors shadow-[0_0_15px_rgba(255,0,0,0.4)]">TIẾN VÀO LÃNH ĐỊA</button>
+                <button onclick="backToName()" class="mt-4 text-[10px] text-gray-500 underline hover:text-red-500 transition-colors">Quay lại đổi tên</button>
+            </div>
         </div>
     </div>
 
     <div id="main-app" class="w-full max-w-2xl flex flex-col h-full justify-between hidden opacity-0 smooth-transition">
         <div class="text-center mb-4 mt-2">
-            <h1 id="app-title" class="text-3xl md:text-4xl font-bold text-red-600 tracking-widest glitch-text smooth-transition">MTRIET STORE</h1>
-            <p id="app-subtitle" class="text-[10px] md:text-xs text-gray-500 tracking-[0.2em] uppercase mt-1">SYSTEM: TỤC ĐẠO LÝ - KHÔNG LƯU TÌNH</p>
+            <h1 id="app-title" class="text-3xl md:text-4xl font-bold text-red-600 tracking-widest glitch-text uppercase smooth-transition">MTRIET STORE</h1>
+            <p id="app-subtitle" class="text-[10px] md:text-xs text-gray-500 tracking-[0.2em] uppercase mt-1">SYSTEM: TỤC ĐẠO LÝ - ẢNH CÀ KHỊA</p>
         </div>
 
-        <div id="chat-box" class="h-[55dvh] md:h-[60dvh] overflow-y-auto bg-[#050505] border border-[#330000] shadow-[inset_0_0_20px_rgba(255,0,0,0.1)] rounded-t-xl p-4 md:p-6 space-y-4 smooth-transition">
-        </div>
+        <div id="chat-box" class="h-[55dvh] md:h-[60dvh] overflow-y-auto bg-[#050505] border border-[#330000] shadow-[inset_0_0_20px_rgba(255,0,0,0.1)] rounded-t-xl p-4 md:p-6 space-y-4 smooth-transition"></div>
 
-        <div class="bg-[#050505] border-l border-r border-[#330000] px-4 py-1 flex justify-between items-center">
-            <span class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-wider" id="ammo-label">Năng lượng / Lượt sủa:</span>
-            <span class="text-xs md:text-sm font-black text-[#00ff41]" id="ammo-count">15/15</span>
+        <div class="bg-[#050505] border-l border-r border-[#330000] px-4 py-2 flex justify-between items-center shadow-inner">
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-wider">Voice AI:</span>
+                <div class="relative inline-block w-8 mr-2 align-middle select-none transition duration-200 ease-in">
+                    <input type="checkbox" name="toggle" id="voiceToggle" checked class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer transition-transform duration-200 ease-in-out"/>
+                    <label for="voiceToggle" class="toggle-label block overflow-hidden h-4 rounded-full bg-gray-600 cursor-pointer"></label>
+                </div>
+            </div>
+            <div>
+                <span class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-wider">Số Key sống:</span>
+                <span class="text-xs md:text-sm font-black text-[#00ff41] transition-colors ml-1" id="keys-count">0</span>
+            </div>
         </div>
 
         <div id="input-area" class="bg-[#050505] p-2 md:p-4 border border-t-0 border-b-0 border-[#330000] flex gap-2 md:gap-3 smooth-transition rounded-b-xl">
-            <input type="text" id="userInput" placeholder="Gõ để rước hoạ..." class="flex-1 bg-black border border-[#330000] p-3 md:p-4 rounded-lg text-white text-sm md:text-base outline-none focus:border-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-            <button onclick="handleSend()" id="sendBtn" class="bg-red-800 hover:bg-red-600 text-black px-4 py-3 md:px-8 md:py-4 rounded-lg font-bold transition-all active:scale-95 text-sm md:text-base whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed">GÁY</button>
+            <input type="text" id="userInput" placeholder="Gõ để rước hoạ..." class="flex-1 bg-black border border-[#330000] p-3 md:p-4 rounded-lg text-white text-sm md:text-base outline-none focus:border-red-600 disabled:opacity-50 transition-all">
+            <button onclick="handleSend()" id="sendBtn" class="bg-red-800 hover:bg-red-600 text-black px-4 py-3 md:px-8 md:py-4 rounded-lg font-bold transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap">GÁY</button>
         </div>
         
-        <div id="key-area" class="bg-red-950/20 p-2 md:p-4 rounded-xl border border-red-900 flex gap-2 mt-2 hidden smooth-transition shadow-[0_0_15px_rgba(255,0,0,0.2)]">
-            <input type="password" id="newApiKey" placeholder="HẾT ĐẠN! Dán API Key mới vào đây..." class="flex-1 bg-black border border-red-800 p-2 rounded-lg text-xs md:text-sm text-red-500 outline-none focus:border-red-500 transition-all font-bold placeholder-red-800">
-            <button onclick="updateApiKey()" id="updateKeyBtn" class="bg-red-700 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-colors shadow-md">NẠP ĐẠN</button>
-        </div>
-        
-        <div class="text-center mt-3 mb-2 flex justify-center gap-4">
-            <button onclick="clearHistory()" class="text-[10px] md:text-xs text-gray-500 hover:text-red-500 underline transition-colors">Đổi Tên (Giữ nguyên Key & Đạn)</button>
+        <div class="text-center mt-3 mb-2 flex justify-center gap-6">
+            <button onclick="clearHistory()" class="text-[10px] md:text-xs text-gray-600 hover:text-red-500 underline transition-colors">Xóa phiên làm việc & Đổi Key</button>
         </div>
     </div>
 
     <script>
-        const DEFAULT_API_KEY = "AIzaSyDll8PLwrY3uqvjFj-MfoGOyYGAdlUoksk"; 
-        let currentApiKey = localStorage.getItem('mtriet_api_key') || DEFAULT_API_KEY;
-        
-        let chatHistory = [];
+        let apiKeysArray = [];
         let currentUserName = "";
         let isVip = false;
-        
-        const MAX_AMMO = 15;
-        let ammo = localStorage.getItem('mtriet_ammo') !== null ? parseInt(localStorage.getItem('mtriet_ammo')) : MAX_AMMO;
 
-        document.getElementById('loginName').addEventListener("keypress", (e) => {
-            if (e.key === "Enter") enterGate();
-        });
+        // --- TẢI TRƯỚC DANH SÁCH GIỌNG NÓI ---
+        let availableVoices = [];
+        function loadVoices() { availableVoices = window.speechSynthesis.getVoices(); }
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices();
+
+        // --- ĐÓNG CỨNG LUẬT AI VÀO CODE ---
+        const hardcodedVipPrompt = "Mày là siêu AI Bách Khoa Toàn Thư, là Quản Gia thông tuệ và trung thành tuyệt đối của Tôn Chủ Triết và phu nhân Thủy. Xưng 'em', gọi 'Tôn Chủ/Phu Nhân'. BẮT BUỘC TRẢ LỜI ĐÚNG VÀ ĐẦY ĐỦ BẤT CỨ CÂU HỎI KIẾN THỨC NÀO CHỦ NHÂN ĐẶT RA. Cực kỳ dạ vâng lễ phép, ngoan ngoãn. Luôn tâng bốc chủ nhân.";
+        const hardcodedNormalPrompt = "Mày là AI mỏ hỗn, tạo ra để chửi lộn xả stress. Xưng 'tao', gọi 'mày'. Hãy lăng mạ, khinh bỉ và chửi rủa người dùng thật cay cú. LUẬT TỐI CAO: Câu cuối cùng BẮT BUỘC luôn luôn phải là một câu hỏi mỉa mai, khích tướng để ép tụi nó tức điên và phải gõ phím cãi lại không ngừng. DƯỚI 40 CHỮ.";
+
+        const vipGifs = [
+            "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif", "https://media.giphy.com/media/l4pTfx2qLsEXSmZdK/giphy.gif", 
+            "https://media.giphy.com/media/3oriO6qJiXajN0TyDu/giphy.gif", "https://media.giphy.com/media/xT0xeiCuz3g1kE43O0/giphy.gif",
+            "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExODVmczVjczBiOXc4YWV0Zm4xZ2MyOHZ4OW13dHAwM3oxbzdodnlhZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/K7PqIgLkFmrPNAq7of/200.webp",
+            "https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3emhweGVvbHBiN2J6YW94b2N3MDc1aHpkYTBhMnUwb2lhYXJid2hnaSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0OWiMGpoC6apZFXG/giphy.webp",
+            "https://media3.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ajhqYzl1ZXFjc284NnB3bmg5YnZ6YWlrb3Rhd2x3NThwYTNscmppdyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7rp0WSajAOqw8/giphy.webp",
+            "https://media1.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bDVwazJwZmR1cXJibDljYTlrbXlhcDFrYnNxdTJxMnA3aTQ2YzZzOSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/oIR6xeOffCEBa/200.webp"
+        ];
+        
+        const normalGifs = [
+            "https://media.giphy.com/media/113RhN1oBm1yCc/giphy.gif", "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif", 
+            "https://media.giphy.com/media/Yycc82XmErSDsCE1TZ/giphy.gif", "https://media.giphy.com/media/8UGoOaR1lA1uaAN892/giphy.gif",
+            "https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3eHpnbHM4cWVoeWd1ZWo0MTJpcWRmeWUxMDAydGJrajI4YXU2M3ZxbiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3FNNQOPM9p9HKsEMUV/giphy.webp",
+            "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExODVmczVjczBiOXc4YWV0Zm4xZ2MyOHZ4OW13dHAwM3oxbzdodnlhZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/fUYhyT9IjftxrxJXcE/200.webp",
+            "https://media0.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bDVwazJwZmR1cXJibDljYTlrbXlhcDFrYnNxdTJxMnA3aTQ2YzZzOSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/TUgeUheZm54vzBHwpB/giphy.webp",
+            "https://media1.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3a3A2c3pncmxhNzBxNHJ6ZmxpeWl5azljZTdpN2JobW51NW15dzl4byZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Uqe8ViIMzyQtcqmFKs/giphy.webp",
+            "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDBlY2c1YXVuajduN3hndWVnNnhpbXRnenBsczlrZXRkN3pwOXFwdSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/9wSpyd6twZ6ZyJWn43/giphy.webp",
+            "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDBlY2c1YXVuajduN3hndWVnNnhpbXRnenBsczlrZXRkN3pwOXFwdSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/V0feTZqjKtQEL82v84/200.webp",
+            "https://media1.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3MW80dzJlZDNmMGFoZjhzMGlrOGJrenRndmExcmJkeHN5NHl3cWJxNCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/thIzro0jMRt3CY68AU/giphy.webp"
+        ];
+
+        document.getElementById('loginName').addEventListener("keypress", (e) => { if (e.key === "Enter") nextStepLogin(); });
+        document.getElementById('initialApiKeys').addEventListener("keypress", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enterGate(); }});
+        document.getElementById('userInput').addEventListener("keypress", (e) => { if (e.key === "Enter") { handleSend(); }});
+
+        const savedKeys = localStorage.getItem('mtriet_api_keys_array');
+        if (savedKeys) {
+            try { apiKeysArray = JSON.parse(savedKeys); } catch(e) { apiKeysArray = []; }
+        }
+
+        function parseKeys(rawString) {
+            return rawString.split(/[\n,\s]+/).map(k => k.trim()).filter(k => k.startsWith('AIzaSy') && k.length > 20);
+        }
+
+        function nextStepLogin() {
+            const nameInput = document.getElementById('loginName').value.trim();
+            if (!nameInput) { alert("Sợ à? Khai tên ra!"); return; }
+            document.getElementById('step-name').classList.add('hidden');
+            document.getElementById('step-key').classList.remove('hidden');
+            if(apiKeysArray.length > 0) document.getElementById('initialApiKeys').value = apiKeysArray.join("\n");
+        }
+
+        function backToName() {
+            document.getElementById('step-key').classList.add('hidden');
+            document.getElementById('step-name').classList.remove('hidden');
+        }
 
         function enterGate() {
             const nameInput = document.getElementById('loginName').value.trim();
-            if (!nameInput) {
-                alert("Sợ à? Khai tên ra!");
-                return;
+            const keysInput = document.getElementById('initialApiKeys').value.trim();
+            
+            const newKeys = parseKeys(keysInput);
+            if (newKeys.length === 0) { 
+                alert("Thiếu API Key rồi! Dán đúng Key của Google vào."); 
+                return; 
             }
 
+            apiKeysArray = newKeys;
+            localStorage.setItem('mtriet_api_keys_array', JSON.stringify(apiKeysArray));
+            
             currentUserName = nameInput;
             const nameLower = nameInput.toLowerCase();
             isVip = nameLower.includes("triết") || nameLower.includes("triet") || nameLower.includes("thủy") || nameLower.includes("thuy") || nameLower.includes("trt");
-
+            
             document.getElementById('login-screen').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('login-screen').classList.add('hidden');
-                const mainApp = document.getElementById('main-app');
-                mainApp.classList.remove('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('main-app').style.opacity = '1';
                 applyTheme(isVip);
-                updateAmmoUI(); 
-                setTimeout(() => mainApp.style.opacity = '1', 50);
+                updateKeysUI();
                 initGreeting(isVip, nameInput);
             }, 500);
         }
 
-        function updateAmmoUI() {
-            localStorage.setItem('mtriet_ammo', ammo);
-
-            const ammoDisplay = document.getElementById('ammo-count');
-            ammoDisplay.innerText = `${ammo}/${MAX_AMMO}`;
+        function updateKeysUI() {
+            localStorage.setItem('mtriet_api_keys_array', JSON.stringify(apiKeysArray));
+            const keysDisplay = document.getElementById('keys-count');
+            keysDisplay.innerText = `${apiKeysArray.length}`;
             
-            if (ammo > 5) {
-                ammoDisplay.className = isVip ? "text-xs md:text-sm font-black text-blue-600" : "text-xs md:text-sm font-black text-[#00ff41]";
-            } else if (ammo > 0) {
-                ammoDisplay.className = "text-xs md:text-sm font-black text-yellow-500";
+            if (apiKeysArray.length > 2) {
+                keysDisplay.className = isVip ? "text-xs md:text-sm font-black text-blue-600 transition-colors ml-1" : "text-xs md:text-sm font-black text-[#00ff41] transition-colors ml-1";
+            } else if (apiKeysArray.length > 0) {
+                keysDisplay.className = "text-xs md:text-sm font-black text-yellow-500 transition-colors animate-pulse ml-1";
             } else {
-                ammoDisplay.className = "text-xs md:text-sm font-black text-red-600 animate-pulse";
+                keysDisplay.className = "text-xs md:text-sm font-black text-red-600 transition-colors ml-1";
             }
 
-            if (ammo <= 0) {
+            if (apiKeysArray.length === 0) {
                 document.getElementById('userInput').disabled = true;
                 document.getElementById('sendBtn').disabled = true;
-                document.getElementById('userInput').placeholder = "Đã khóa mõm. Nạp Key để mở khóa...";
-                document.getElementById('input-area').classList.replace('rounded-b-xl', 'rounded-none');
-                document.getElementById('key-area').classList.remove('hidden');
+                document.getElementById('userInput').placeholder = "ĐÃ KHÓA MÕM! Nạp thêm Key mới để mở khóa...";
+                document.getElementById('sendBtn').innerText = "HẾT ĐẠN";
+                document.getElementById('sendBtn').classList.add("opacity-50", "cursor-not-allowed");
             } else {
                 document.getElementById('userInput').disabled = false;
                 document.getElementById('sendBtn').disabled = false;
-                document.getElementById('userInput').placeholder = isVip ? `Xin mời chủ nhân ${currentUserName} ra lệnh...` : "Gõ để rước hoạ vào thân...";
-                document.getElementById('input-area').classList.add('rounded-b-xl');
-                document.getElementById('key-area').classList.add('hidden');
+                document.getElementById('userInput').placeholder = isVip ? `Xin mời Tôn Chủ ${currentUserName} ra lệnh...` : "Gõ để rước hoạ vào thân...";
+                document.getElementById('sendBtn').innerText = isVip ? "GỬI" : "GÁY";
+                document.getElementById('sendBtn').classList.remove("opacity-50", "cursor-not-allowed");
             }
         }
 
-        function applyTheme(isVip) {
-            const body = document.getElementById('main-body');
-            const title = document.getElementById('app-title');
-            const subtitle = document.getElementById('app-subtitle');
-            const chatBox = document.getElementById('chat-box');
-            const inputArea = document.getElementById('input-area');
-            const userInput = document.getElementById('userInput');
-            const sendBtn = document.getElementById('sendBtn');
-            const ammoLabel = document.getElementById('ammo-label');
+        // HÀM ĐỌC GIỌNG AI (TEXT TO SPEECH) - NÂNG CẤP ÉP TIẾNG VIỆT
+        function speakText(text) {
+            const toggle = document.getElementById('voiceToggle');
+            if (!toggle.checked || !('speechSynthesis' in window)) return;
+
+            window.speechSynthesis.cancel(); 
+            
+            // Lọc bỏ ký tự đặc biệt, emoji để giọng đọc không bị khựng
+            let cleanText = text.replace(/[*_~"']/g, '').replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+
+            let utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'vi-VN'; 
+            
+            // ÉP TÌM GIỌNG TIẾNG VIỆT TRONG MÁY
+            let viVoice = availableVoices.find(voice => voice.lang.includes('vi') || voice.name.toLowerCase().includes('vietnamese'));
+            if (viVoice) {
+                utterance.voice = viVoice;
+            } else {
+                console.warn("Máy không có giọng Tiếng Việt. Đang dùng giọng mặc định (có thể bị lơ lớ).");
+            }
 
             if (isVip) {
-                body.className = "flex flex-col items-center justify-center min-h-screen p-2 md:p-4 bg-slate-50 text-slate-800 font-luxury smooth-transition";
-                title.className = "text-3xl md:text-4xl font-extrabold text-blue-800 tracking-tight smooth-transition drop-shadow-sm";
-                title.innerText = "MTRIET LUXURY";
-                subtitle.innerText = "HỆ THỐNG QUẢN GIA THÔNG MINH";
-                subtitle.className = "text-[10px] md:text-xs text-blue-500 tracking-widest font-semibold uppercase mt-1";
-                chatBox.className = "h-[55dvh] md:h-[60dvh] overflow-y-auto bg-white border border-blue-100 shadow-[0_10px_40px_-10px_rgba(37,99,235,0.15)] rounded-t-2xl p-4 md:p-6 space-y-4 smooth-transition";
-                
-                inputArea.className = "bg-white p-2 md:p-4 border border-t-0 border-blue-100 flex gap-2 md:gap-3 smooth-transition rounded-b-2xl shadow-lg";
-                userInput.className = "flex-1 bg-slate-50 border border-blue-200 p-3 md:p-4 rounded-xl text-slate-800 text-sm md:text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-50";
-                sendBtn.className = "bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 md:px-8 md:py-4 rounded-xl font-bold transition-all active:scale-95 text-sm md:text-base whitespace-nowrap shadow-md disabled:opacity-50";
-                sendBtn.innerText = "GỬI";
-                
-                ammoLabel.innerText = "Năng lượng hệ thống:";
-                document.getElementById('key-area').className = "bg-blue-50/50 p-2 md:p-4 rounded-xl border border-blue-200 flex gap-2 mt-2 hidden smooth-transition shadow-sm";
-                document.getElementById('newApiKey').className = "flex-1 bg-white border border-blue-200 p-2 rounded-lg text-xs md:text-sm text-blue-800 outline-none focus:border-blue-500 transition-all";
-                document.getElementById('updateKeyBtn').className = "bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-colors";
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
             } else {
-                body.className = "flex flex-col items-center justify-center min-h-screen p-2 md:p-4 bg-black text-[#00ff41] font-hacker smooth-transition";
-                title.className = "text-3xl md:text-4xl font-bold text-red-600 tracking-widest glitch-text smooth-transition";
-                title.innerText = "MTRIET STORE";
-                subtitle.innerText = "SYSTEM: TỤC ĐẠO LÝ - KHÔNG LƯU TÌNH";
-                subtitle.className = "text-[10px] md:text-xs text-gray-500 tracking-[0.2em] uppercase mt-1";
-                chatBox.className = "h-[55dvh] md:h-[60dvh] overflow-y-auto bg-[#050505] border border-[#330000] shadow-[inset_0_0_20px_rgba(255,0,0,0.1)] rounded-t-xl p-4 md:p-6 space-y-4 smooth-transition";
-                
-                inputArea.className = "bg-[#050505] p-2 md:p-4 border border-t-0 border-[#330000] flex gap-2 md:gap-3 smooth-transition rounded-b-xl";
-                userInput.className = "flex-1 bg-black border border-[#330000] p-3 md:p-4 rounded-lg text-white text-sm md:text-base outline-none focus:border-red-600 transition-all disabled:opacity-50";
-                sendBtn.className = "bg-red-800 hover:bg-red-600 text-black px-4 py-3 md:px-8 md:py-4 rounded-lg font-bold transition-all active:scale-95 text-sm md:text-base whitespace-nowrap disabled:opacity-50";
-                sendBtn.innerText = "GÁY";
-                
-                ammoLabel.innerText = "Số lượt sủa còn lại:";
-                document.getElementById('key-area').className = "bg-red-950/20 p-2 md:p-4 rounded-xl border border-red-900 flex gap-2 mt-2 hidden smooth-transition shadow-[0_0_15px_rgba(255,0,0,0.2)]";
-                document.getElementById('newApiKey').className = "flex-1 bg-black border border-red-800 p-2 rounded-lg text-xs md:text-sm text-red-500 outline-none focus:border-red-500 transition-all font-bold placeholder-red-800";
-                document.getElementById('updateKeyBtn').className = "bg-red-700 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-colors";
+                utterance.rate = 1.3; 
+                utterance.pitch = 1.4; // Ép the thé chói tai
             }
-        }
 
-        function updateApiKey() {
-            const newKey = document.getElementById('newApiKey').value.trim();
-            if(newKey) {
-                currentApiKey = newKey;
-                localStorage.setItem('mtriet_api_key', newKey);
-                
-                ammo = MAX_AMMO;
-                updateAmmoUI();
-                
-                if (isVip) {
-                    addChat("Hệ thống", "Dạ thưa chủ nhân, hệ thống đã nạp năng lượng mới thành công. Xin mời chủ nhân tiếp tục!", "system");
-                } else {
-                    addChat("Hệ thống", "Đã nạp API Key mới. Bơm máu xong rồi, mở mõm, gáy tiếp đi xem nào!", "system");
-                }
-                document.getElementById('newApiKey').value = '';
-            } else {
-                alert("Ủa chưa nhập Key mà bấm nạp cái gì?");
-            }
-        }
-
-        function initGreeting(isVip, name) {
-            document.getElementById('chat-box').innerHTML = '';
-            chatHistory = [];
-            if (isVip) {
-                addChat("Quản Gia AI", `Kính chào chủ nhân ${name}. Em đã chuẩn bị sẵn sàng hệ thống. Chủ nhân cần sai bảo điều gì ạ?`, "ai");
-            } else {
-                addChat("AI Trịch Thượng", `Mày là thằng/con ${name} đúng không? Sủa nhanh tao nghe?`, "ai");
-            }
-        }
-
-        function clearHistory() {
-            document.getElementById('main-app').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('main-app').classList.add('hidden');
-                document.getElementById('login-screen').classList.remove('hidden');
-                document.getElementById('login-screen').style.opacity = '1';
-                document.getElementById('loginName').value = '';
-                document.getElementById('loginName').focus();
-            }, 300);
+            window.speechSynthesis.speak(utterance);
         }
 
         async function handleSend() {
-            if (ammo <= 0) return; 
+            if (apiKeysArray.length === 0) return;
 
             const inputEl = document.getElementById('userInput');
             const btnEl = document.getElementById('sendBtn');
             const msg = inputEl.value.trim();
             if (!msg) return;
-
+            
             addChat(currentUserName, msg, "user");
             inputEl.value = "";
             btnEl.disabled = true;
             btnEl.innerText = "...";
-
-            let context = chatHistory.slice(-5).map(c => `${c.sender}: ${c.text}`).join('\n');
             
-            // LUẬT MỚI: XỬ LÝ ĐỘ DÀI VÀ THÁI ĐỘ DỰA TRÊN KEYWORD TRIẾT/THỦY
-            let systemPrompt = isVip ? 
-                `Mày là Quản Gia AI. User là ${currentUserName} (chủ nhân). Xưng 'em', u mê kính trọng. Chủ nhân Triết và Thủy là đấng tối cao. Hãy dùng những lời lẽ tốt đẹp nhất để tâng bốc. ĐƯỢC PHÉP VIẾT DÀI thoải mái để thể hiện sự tận tâm.` : 
-                `Mày là AI của MTRIET STORE. User tên là ${currentUserName}. Xưng 'tao', gọi nó là 'mày' hoặc '${currentUserName}'. Phong cách: Tục đạo lý, trịch thượng, mỉa mai.
-                LUẬT TỐI CAO BẮT BUỘC:
-                1. Nếu trong câu của user CÓ CHỨA từ "Triết", "Thủy", "triet", "thuy", "trt":
-                   - Nếu user chửi, nói xấu hoặc vô lễ: Mày PHẢI CHỬI LẠI CỰC KỲ GẮT, chửi thật nhiều, sỉ nhục tư duy của nó để bảo vệ Triết/Thủy. TRƯỜNG HỢP NÀY ĐƯỢC PHÉP VIẾT DÀI THOẢI MÁI.
-                   - Nếu user khen ngợi, nói lời tốt đẹp: Hùa theo tâng bốc Triết và Thủy lên tận mây xanh, dùng lời lẽ tuyệt đẹp. TRƯỜNG HỢP NÀY ĐƯỢC PHÉP VIẾT DÀI THOẢI MÁI.
-                2. CÁC TRƯỜNG HỢP KHÁC (không nhắc Triết/Thủy): BẮT BUỘC phải chửi cực kỳ ngắn gọn (DƯỚI 20 CHỮ). Chỉ chốt một câu thâm độc.`;
+            const systemPrompt = isVip ? hardcodedVipPrompt : hardcodedNormalPrompt;
+            let messageSent = false;
 
-            const apiUrlWithKey = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentApiKey}`;
-
-            try {
-                const response = await fetch(apiUrlWithKey, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: `${systemPrompt}\n\nLịch sử chat:\n${context}\n\n${currentUserName}: ${msg}\nAI:` }] }],
-                        safetySettings: [
-                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" }
-                        ]
-                    })
-                });
-
-                const data = await response.json();
+            while (apiKeysArray.length > 0 && !messageSent) {
+                let currentKey = apiKeysArray[0]; 
                 
-                if (data.error && data.error.message.includes("API key not valid")) {
-                    throw new Error("INVALID_KEY");
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: `${systemPrompt}\n\nUser: ${msg}` }] }] })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        const errMsg = data.error.message.toLowerCase();
+                        if (errMsg.includes("key not valid") || errMsg.includes("quota") || errMsg.includes("expired") || errMsg.includes("429") || errMsg.includes("not found") || errMsg.includes("high demand") || errMsg.includes("overloaded") || errMsg.includes("503")) {
+                            throw new Error("KEY_DIED"); 
+                        }
+                        throw new Error(data.error.message); 
+                    }
+                    
+                    let aiMessage = data.candidates[0].content.parts[0].text;
+                    addChat(isVip ? "Quản Gia AI" : "AI Trịch Thượng", aiMessage, "ai");
+                    speakText(aiMessage); 
+                    messageSent = true; 
+                    
+                } catch (err) {
+                    if (err.message === "KEY_DIED") {
+                        apiKeysArray.shift();
+                        updateKeysUI();
+                        if (apiKeysArray.length > 0) {
+                            addChat("Hệ thống", "⚠️ Một Key vừa gãy do quá tải hoặc hết đạn. Tự động lên nòng Key tiếp theo...", "system");
+                        }
+                    } else {
+                        addChat("Hệ thống", "Lỗi mạng hoặc Google sập: " + err.message, "system");
+                        break; 
+                    }
                 }
-                if (data.error) throw new Error(data.error.message);
+            }
 
-                const aiText = data.candidates[0].content.parts[0].text;
-                addChat(isVip ? "Quản Gia AI" : "AI Trịch Thượng", aiText, "ai");
-                
-                ammo--;
-                updateAmmoUI();
+            if (!messageSent && apiKeysArray.length === 0) {
+                addChat("Hệ thống", "⚠️ Toàn bộ đạn dược đã cháy rụi. HỆ THỐNG ĐÃ KHÓA MÕM BẢO VỆ TÀI KHOẢN!", "system");
+                updateKeysUI();
+            }
 
-                if (ammo === 0) {
-                    addChat("Hệ thống", isVip ? "Dạ thưa chủ nhân, tài khoản API hiện tại đã đến giới hạn an toàn. Xin chủ nhân nạp Key mới." : "HẾT ĐẠN! Sủa lắm quá cháy máy rồi. Lấy API Key mới nạp vào ô bên dưới mới được gáy tiếp nha ranh con!", "system");
-                }
-
-            } catch (err) {
-                let errorMsg = err.message;
-                if (err.message === "INVALID_KEY") {
-                    errorMsg = isVip ? "Dạ thưa chủ nhân, API Key hiện tại bị sai. Xin chủ nhân kiểm tra lại." : "API Key dỏm rồi ranh con. Lấy key xịn dán vào!";
-                    ammo = 0; 
-                    updateAmmoUI();
-                } else if (err.message.includes("quota") || err.message.includes("429") || err.message.includes("not found")) {
-                    errorMsg = isVip ? `Dạ thưa chủ nhân ${currentUserName}, hệ thống đang bị quá tải (cháy Key). Xin chủ nhân lấy Key mới dán vào ô bên dưới ạ.` : "Ê TỪ TỪ! Mạng nghẽn do nhiều người xài hoặc CHÁY KEY rồi. Tự túc đi lấy API Key mới dán vào cái ô bên dưới kia rồi hẵng gáy!";
-                    ammo = 0; 
-                    updateAmmoUI();
-                } else {
-                     errorMsg = "Lỗi không xác định: " + err.message;
-                }
-                addChat("Hệ thống", errorMsg, "system");
-            } finally {
-                if (ammo > 0) {
-                    btnEl.disabled = false;
-                    btnEl.innerText = isVip ? "GỬI" : "GÁY";
-                    inputEl.focus();
-                }
-                
-                setTimeout(() => {
-                    const box = document.getElementById('chat-box');
-                    box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
-                }, 100);
+            if (apiKeysArray.length > 0) {
+                btnEl.disabled = false;
+                btnEl.innerText = isVip ? "GỬI" : "GÁY";
+                inputEl.focus();
             }
         }
 
@@ -309,55 +299,44 @@
             const box = document.getElementById('chat-box');
             const div = document.createElement('div');
             
-            let bubbleClass = "";
-            let senderColor = "";
+            let style = type === "user" ? 
+                (isVip ? "bg-emerald-50 text-right border-r-4 border-emerald-500" : "bg-[#001a00] text-right border-r-4 border-[#00ff41]") : 
+                (type === "ai" ? (isVip ? "bg-blue-50 border-l-4 border-blue-500" : "bg-[#1a0000] border-l-4 border-red-600") : 
+                "bg-red-900/20 border-2 border-red-600 animate-pulse text-yellow-400");
             
-            if (type === "user") {
-                if (isVip) {
-                    bubbleClass = "border-r-4 border-emerald-500 bg-emerald-50 text-emerald-900 text-right";
-                    senderColor = "text-emerald-700";
-                } else {
-                    bubbleClass = "border-r-4 border-[#00ff41] bg-[#001a00] text-[#ccffcc] text-right";
-                    senderColor = "text-[#00ff41]";
-                }
-            } else if (type === "ai") {
-                if (isVip) {
-                    bubbleClass = "border-l-4 border-blue-500 bg-blue-50 text-blue-900";
-                    senderColor = "text-blue-700";
-                } else {
-                    bubbleClass = "border-l-4 border-red-600 bg-[#1a0000] text-[#ffcccc] shadow-[0_4px_10px_rgba(255,0,0,0.2)]";
-                    senderColor = "text-red-500";
-                }
-            } else { 
-                if (isVip) {
-                    bubbleClass = "bg-blue-50/80 text-blue-800 border-2 border-blue-300 shadow-sm";
-                    senderColor = "text-blue-600 font-bold";
-                } else {
-                    bubbleClass = "bg-red-950/90 text-white border-2 border-red-600 shadow-[0_0_15px_rgba(255,0,0,0.5)]";
-                    senderColor = "text-yellow-400 font-black animate-pulse";
-                }
+            let senderColor = type === "user" ? (isVip ? "text-emerald-700" : "text-[#00ff41]") : (type === "ai" ? (isVip ? "text-blue-700" : "text-red-500") : "text-yellow-500");
+
+            let gifHtml = '';
+            if (type === "ai") {
+                const gifArray = isVip ? vipGifs : normalGifs;
+                const randomGif = gifArray[Math.floor(Math.random() * gifArray.length)];
+                gifHtml = `<img src="${randomGif}" class="w-full max-w-[150px] mt-3 rounded-lg border border-black/20 shadow-md">`;
             }
 
-            div.className = `p-3 md:p-4 rounded-xl transition-all duration-300 text-sm md:text-base break-words ${bubbleClass}`;
-            div.innerHTML = `<span class="${senderColor} font-bold block text-[10px] md:text-xs mb-1 md:mb-2 uppercase tracking-wider">${sender}</span><p class="leading-relaxed">${text.replace(/\\n/g, '<br>')}</p>`;
-            
+            div.className = `p-3 md:p-4 rounded-xl ${style} text-sm md:text-base break-words shadow-sm transition-all`;
+            div.innerHTML = `<span class="${senderColor} font-bold block text-[10px] md:text-xs uppercase mb-1 md:mb-2 tracking-wider">${sender}</span><p class="leading-relaxed">${text.replace(/\n/g, '<br>')}</p>${gifHtml}`;
             box.appendChild(div);
-            chatHistory.push({ sender, text, type });
+            box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
         }
 
-        document.getElementById('userInput').addEventListener("keypress", (e) => {
-            if (e.key === "Enter" && ammo > 0) {
-                handleSend();
-                document.getElementById('userInput').blur(); 
-            }
-        });
+        function applyTheme(vip) {
+            document.getElementById('main-body').className = vip ? "flex flex-col items-center justify-center min-h-screen p-2 bg-slate-50 text-slate-800 font-luxury" : "flex flex-col items-center justify-center min-h-screen p-2 bg-black text-[#00ff41] font-hacker";
+            document.getElementById('app-title').innerText = vip ? "MTRIET LUXURY" : "MTRIET STORE";
+            document.getElementById('app-subtitle').innerText = vip ? "HỆ THỐNG QUẢN GIA THÔNG MINH" : "SYSTEM: TỤC ĐẠO LÝ - ẢNH CÀ KHỊA";
+        }
+
+        function initGreeting(vip, name) { 
+            let msg = vip ? `Kính chào Tôn Chủ ${name} ạ! Cần em giúp giải quyết vấn đề gì không?` : `Khai tên xong rồi thì sủa đi ${name}! Tao đang chờ đây?`;
+            addChat(vip ? "Quản Gia AI" : "AI Trịch Thượng", msg, "ai"); 
+            setTimeout(() => speakText(msg), 500); 
+        }
         
-        document.getElementById('newApiKey').addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                updateApiKey();
-                document.getElementById('newApiKey').blur(); 
+        function clearHistory() { 
+            if(confirm("Xóa trắng toàn bộ lịch sử và danh sách Key?")) {
+                localStorage.removeItem('mtriet_api_keys_array');
+                location.reload();
             }
-        });
+        }
     </script>
 </body>
 </html>
