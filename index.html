@@ -83,13 +83,33 @@
         let currentUserName = "";
         let isVip = false;
 
+        // --- CƠ CHẾ ĐÁNH LỪA TRÌNH DUYỆT ĐIỆN THOẠI ĐỂ MỞ KHÓA LOA ---
+        let isSpeechUnlocked = false;
+        function unlockSpeechOnMobile() {
+            if (!isSpeechUnlocked && 'speechSynthesis' in window) {
+                try {
+                    let utterance = new SpeechSynthesisUtterance('');
+                    utterance.volume = 0;
+                    window.speechSynthesis.speak(utterance);
+                    isSpeechUnlocked = true;
+                    document.removeEventListener('click', unlockSpeechOnMobile);
+                    document.removeEventListener('touchstart', unlockSpeechOnMobile);
+                } catch(e) { console.log("Lỗi mở khóa audio ngầm:", e); }
+            }
+        }
+        document.addEventListener('click', unlockSpeechOnMobile);
+        document.addEventListener('touchstart', unlockSpeechOnMobile);
+        // -------------------------------------------------------------
+
         // --- TẢI TRƯỚC DANH SÁCH GIỌNG NÓI ---
         let availableVoices = [];
-        function loadVoices() { availableVoices = window.speechSynthesis.getVoices(); }
-        window.speechSynthesis.onvoiceschanged = loadVoices;
+        function loadVoices() { 
+            try { availableVoices = window.speechSynthesis.getVoices(); } 
+            catch(e) { console.log("Không tải được giọng:", e); }
+        }
+        if ('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged = loadVoices;
         loadVoices();
 
-        // --- ĐÓNG CỨNG LUẬT AI VÀO CODE ---
         const hardcodedVipPrompt = "Mày là siêu AI Bách Khoa Toàn Thư, là Quản Gia thông tuệ và trung thành tuyệt đối của Tôn Chủ Triết và phu nhân Thủy. Xưng 'em', gọi 'Tôn Chủ/Phu Nhân'. BẮT BUỘC TRẢ LỜI ĐÚNG VÀ ĐẦY ĐỦ BẤT CỨ CÂU HỎI KIẾN THỨC NÀO CHỦ NHÂN ĐẶT RA. Cực kỳ dạ vâng lễ phép, ngoan ngoãn. Luôn tâng bốc chủ nhân.";
         const hardcodedNormalPrompt = "Mày là AI mỏ hỗn, tạo ra để chửi lộn xả stress. Xưng 'tao', gọi 'mày'. Hãy lăng mạ, khinh bỉ và chửi rủa người dùng thật cay cú. LUẬT TỐI CAO: Câu cuối cùng BẮT BUỘC luôn luôn phải là một câu hỏi mỉa mai, khích tướng để ép tụi nó tức điên và phải gõ phím cãi lại không ngừng. DƯỚI 40 CHỮ.";
 
@@ -196,36 +216,37 @@
             }
         }
 
-        // HÀM ĐỌC GIỌNG AI (TEXT TO SPEECH) - NÂNG CẤP ÉP TIẾNG VIỆT
         function speakText(text) {
-            const toggle = document.getElementById('voiceToggle');
-            if (!toggle.checked || !('speechSynthesis' in window)) return;
+            // Bao bọc hàm phát âm thanh bằng try-catch để lỡ lỗi thì không bị sập hàm
+            try {
+                const toggle = document.getElementById('voiceToggle');
+                if (!toggle || !toggle.checked || !('speechSynthesis' in window)) return;
 
-            window.speechSynthesis.cancel(); 
-            
-            // Lọc bỏ ký tự đặc biệt, emoji để giọng đọc không bị khựng
-            let cleanText = text.replace(/[*_~"']/g, '').replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+                window.speechSynthesis.cancel(); 
+                
+                let cleanText = text.replace(/[*_~"']/g, '').replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
 
-            let utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = 'vi-VN'; 
-            
-            // ÉP TÌM GIỌNG TIẾNG VIỆT TRONG MÁY
-            let viVoice = availableVoices.find(voice => voice.lang.includes('vi') || voice.name.toLowerCase().includes('vietnamese'));
-            if (viVoice) {
-                utterance.voice = viVoice;
-            } else {
-                console.warn("Máy không có giọng Tiếng Việt. Đang dùng giọng mặc định (có thể bị lơ lớ).");
+                let utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'vi-VN'; 
+                
+                let viVoice = availableVoices.find(voice => voice.lang.includes('vi') || voice.name.toLowerCase().includes('vietnamese'));
+                if (viVoice) {
+                    utterance.voice = viVoice;
+                }
+
+                if (isVip) {
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.0;
+                } else {
+                    utterance.rate = 1.25; 
+                    utterance.pitch = 1.3; 
+                }
+
+                utterance.volume = 1;
+                window.speechSynthesis.speak(utterance);
+            } catch(error) {
+                console.log("Audio bị chặn, không phát tiếng được nhưng web vẫn chạy.");
             }
-
-            if (isVip) {
-                utterance.rate = 0.9;
-                utterance.pitch = 1.0;
-            } else {
-                utterance.rate = 1.3; 
-                utterance.pitch = 1.4; // Ép the thé chói tai
-            }
-
-            window.speechSynthesis.speak(utterance);
         }
 
         async function handleSend() {
@@ -235,7 +256,16 @@
             const btnEl = document.getElementById('sendBtn');
             const msg = inputEl.value.trim();
             if (!msg) return;
-            
+
+            // Chỗ này cũng bọc try-catch để mở khóa loa, không làm sập code
+            try {
+                if ('speechSynthesis' in window && !isSpeechUnlocked) {
+                    let unlockAudio = new SpeechSynthesisUtterance('');
+                    unlockAudio.volume = 0;
+                    window.speechSynthesis.speak(unlockAudio);
+                }
+            } catch(e) {}
+
             addChat(currentUserName, msg, "user");
             inputEl.value = "";
             btnEl.disabled = true;
@@ -266,7 +296,9 @@
                     
                     let aiMessage = data.candidates[0].content.parts[0].text;
                     addChat(isVip ? "Quản Gia AI" : "AI Trịch Thượng", aiMessage, "ai");
-                    speakText(aiMessage); 
+                    
+                    setTimeout(() => speakText(aiMessage), 100); 
+                    
                     messageSent = true; 
                     
                 } catch (err) {
